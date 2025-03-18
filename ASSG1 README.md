@@ -1,3 +1,4 @@
+# ASSIGNMENT 1
 # MPI Programming Tasks
 
 This repository contains implementations of fundamental MPI (Message Passing Interface) programs, covering essential communication techniques used in parallel computing.
