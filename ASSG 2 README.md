@@ -22,6 +22,9 @@ This program performs matrix multiplication on a **70x70** matrix using MPI and 
 - Measures execution time with `omp_get_wtime()`.
 - Uses `MPI_Gather` to collect computed rows.
 
+- <img width="271" alt="image" src="https://github.com/user-attachments/assets/402b98d5-e989-4a9d-b605-2ca90b100e79" />
+
+
 ### 3️⃣ Parallel Sorting Using MPI (Odd-Even Sort)
 Implements Odd-Even Transposition Sort in parallel using MPI to sort an array across multiple processes.
 
