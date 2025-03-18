@@ -44,7 +44,8 @@ Simulates heat distribution over a 2D grid using iterative updates and MPI for p
 - Uses `MPI_Sendrecv` for ghost cell exchange between neighboring processes.
 - Applies iterative Jacobi relaxation method.
 - Measures execution time with `omp_get_wtime()`.
-  <img width="250" alt="image" src="https://github.com/user-attachments/assets/526e56bc-00d9-4ccf-a18c-1b45a7e1e01c" />
+-
+-    <img width="250" alt="image" src="https://github.com/user-attachments/assets/526e56bc-00d9-4ccf-a18c-1b45a7e1e01c" />
 
 
 ### 5️⃣ Parallel Reduction Using MPI
@@ -54,7 +55,8 @@ Implements a parallel reduction operation to compute a sum, maximum, or minimum 
 - `MPI_Reduce` for computing results in a tree-based manner.
 - `MPI_Allreduce` for broadcasting results to all processes.
 - `MPI_Scatter` and `MPI_Gather` for efficient data distribution.
-  <img width="176" alt="image" src="https://github.com/user-attachments/assets/0e07c61b-04d7-4a54-a42d-b903a1709e74" />
+  -
+  -<img width="176" alt="image" src="https://github.com/user-attachments/assets/0e07c61b-04d7-4a54-a42d-b903a1709e74" />
 
 
 ### 6️⃣ Parallel Dot Product Using MPI
@@ -64,7 +66,8 @@ Computes the dot product of two large vectors using MPI parallelism. Each proces
 - Distributes vector segments among processes.
 - Uses `MPI_Reduce` to sum partial results efficiently.
 - Measures execution time using `omp_get_wtime()`.
-  <img width="261" alt="image" src="https://github.com/user-attachments/assets/2b031e36-9575-4fc3-9987-31a64ebfd88f" />
+ -
+ -  <img width="261" alt="image" src="https://github.com/user-attachments/assets/2b031e36-9575-4fc3-9987-31a64ebfd88f" />
 
 
 ### 7️⃣ Parallel Prefix Sum (Scan) Using MPI
@@ -73,7 +76,8 @@ Computes the prefix sum (scan) of an array using parallel techniques in MPI. Eac
 **Key Features:**
 - Uses `MPI_Scan` for cumulative sum calculation.
 - Efficient communication for parallel computation.
-  <img width="178" alt="image" src="https://github.com/user-attachments/assets/878f0379-ce50-4b2e-bae3-d3937664812a" />
+  -
+  -<img width="178" alt="image" src="https://github.com/user-attachments/assets/878f0379-ce50-4b2e-bae3-d3937664812a" />
 
 
 ### 8️⃣ Parallel Matrix Transposition Using MPI
@@ -83,6 +87,9 @@ Transposes a large matrix in parallel using MPI communication primitives. Data i
 - `MPI_Sendrecv` for exchanging rows and columns.
 - Row-wise distribution of data among processes.
 - Performance comparison with serial execution.
+
+- <img width="218" alt="image" src="https://github.com/user-attachments/assets/63024380-9ea5-4d2b-ba8f-f25175a6232a" />
+
 
 ## 🔧 Compilation and Execution
 
