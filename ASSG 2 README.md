@@ -1,4 +1,4 @@
-# MPI Programming Tasks
+# ASSIGNMENT 2
 
 This repository contains implementations of fundamental MPI-based parallel computing algorithms, demonstrating various message-passing and computation techniques. Each task has been implemented using MPI for distributed computing and OpenMP for performance measurement.
 
