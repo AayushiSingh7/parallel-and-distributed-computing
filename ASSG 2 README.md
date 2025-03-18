@@ -11,7 +11,8 @@ This program estimates the value of π using the Monte Carlo method, leveraging 
 - `MPI_Init`, `MPI_Finalize`
 - `MPI_Comm_rank`, `MPI_Comm_size`
 - `MPI_Reduce` for summing results across processes.
- -<img width="197" alt="image" src="https://github.com/user-attachments/assets/0f90f6b1-0fa9-4194-ac3c-18c67cd81860" />
+ -
+  -<img width="197" alt="image" src="https://github.com/user-attachments/assets/0f90f6b1-0fa9-4194-ac3c-18c67cd81860" />
 
 
 ### 2️⃣ Matrix Multiplication Using MPI
@@ -32,6 +33,7 @@ Implements Odd-Even Transposition Sort in parallel using MPI to sort an array ac
 - `MPI_Send` and `MPI_Recv` for exchanging elements.
 - Alternates between even and odd phases for sorting.
 - Uses `MPI_Comm_rank` and `MPI_Comm_size` for distributed execution.
+
 -<img width="293" alt="image" src="https://github.com/user-attachments/assets/9bba8a72-d03a-477f-afd1-331804cebcb4" />
 
 
