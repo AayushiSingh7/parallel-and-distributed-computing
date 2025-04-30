@@ -1,0 +1,62 @@
+UCS 645: Parallel & Distributed Computing - Lab Exercise #6
+Learning Outcomes
+• Understanding and implementation of CUDA.
+Problem Statement
+
+1. Square root of vectors is a more expensive operation than vector addition and multiplication.
+2. Make a CUDA program that computes the square root of A[i] and stores the results in C[i].
+3. Run it using 50,000; 500,000; 5,000,000; and 50,000,000 array elements. 
+   As before, record the timings for each of these in your spreadsheet, and create charts to help us visualize the results.
+
+CUDA Code for Square Root Operation
+
+#include <iostream>
+#include <cmath>
+#include <cuda_runtime.h>
+
+__global__ void sqrtVector(float *A, float *C, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        C[i] = sqrtf(A[i]);
+    }
+}
+
+int main() {
+    int sizes[] = {50000, 500000, 5000000, 50000000};
+    for (int s = 0; s < 4; ++s) {
+        int N = sizes[s];
+        size_t size = N * sizeof(float);
+
+        float *h_A = new float[N];
+        float *h_C = new float[N];
+        for (int i = 0; i < N; ++i) h_A[i] = static_cast<float>(i + 1);
+
+        float *d_A, *d_C;
+        cudaMalloc(&d_A, size);
+        cudaMalloc(&d_C, size);
+
+        cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
+
+        cudaEvent_t start, stop;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+        cudaEventRecord(start);
+
+        sqrtVector<<<(N + 255) / 256, 256>>>(d_A, d_C, N);
+
+        cudaEventRecord(stop);
+        cudaEventSynchronize(stop);
+        float milliseconds = 0;
+        cudaEventElapsedTime(&milliseconds, start, stop);
+
+        cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
+
+        std::cout << "N = " << N << " | Time = " << milliseconds << " ms\n";
+
+        delete[] h_A;
+        delete[] h_C;
+        cudaFree(d_A);
+        cudaFree(d_C);
+    }
+    return 0;
+}
