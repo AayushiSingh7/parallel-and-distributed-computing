@@ -1,0 +1,171 @@
+UCS 645: Parallel & Distributed Computing - Lab Exercise #4
+Learning Outcomes
+
+• Understand how to launch CUDA kernels
+• Understand and demonstrate how to allocate and move memory to and from the GPU
+• Understand CUDA thread block layouts
+
+Problem 1
+
+Write a program using CUDA, in which all the threads are performing different tasks. These tasks are as follows:
+a. Find the sum of first n integer numbers. (you can take n as 1024. Do not use direct formula but use iterative approach)
+b. Find the sum of first n integer numbers. (you can take n as 1024. You can use direct formula not the iterative approach)
+
+Steps:
+1. Define the value of N (Number of Integers)
+2. Create two arrays: One for input and another for output
+3. Allocate memory on device for the data
+4. Fill the array with first N integers
+5. Copy the data from host to device
+6. Define block and grid sizes
+7. Create the kernel for adding the first N Integers and call it from host.
+
+CUDA Code for Problem 1
+
+#include <iostream>
+#include <cuda_runtime.h>
+
+#define N 1024
+
+__global__ void sumIterativeKernel(int *out) {
+    int idx = threadIdx.x;
+    if (idx == 0) {
+        int sum = 0;
+        for (int i = 1; i <= N; i++) {
+            sum += i;
+        }
+        out[0] = sum;
+    }
+}
+
+__global__ void sumFormulaKernel(int *out) {
+    int idx = threadIdx.x;
+    if (idx == 0) {
+        out[0] = (N * (N + 1)) / 2;
+    }
+}
+
+int main() {
+    int *d_out, h_out_iterative, h_out_formula;
+
+    cudaMalloc((void**)&d_out, sizeof(int));
+
+    // Iterative sum kernel
+    sumIterativeKernel<<<1, 1>>>(d_out);
+    cudaMemcpy(&h_out_iterative, d_out, sizeof(int), cudaMemcpyDeviceToHost);
+
+    // Formula sum kernel
+    sumFormulaKernel<<<1, 1>>>(d_out);
+    cudaMemcpy(&h_out_formula, d_out, sizeof(int), cudaMemcpyDeviceToHost);
+
+    std::cout << "Iterative Sum = " << h_out_iterative << std::endl;
+    std::cout << "Formula Sum = " << h_out_formula << std::endl;
+
+    cudaFree(d_out);
+    return 0;
+}
+
+Problem 2
+
+Implement merge sort to sort the elements of an array of size n = 1000.
+a. To implement parallelization use pipelining.
+b. Now implement the parallel merge sort using CUDA.
+c. Compare the performance of both (a) and (b) methods.
+
+CPU-based Merge Sort using Pipelining (OpenMP)
+
+#include <iostream>
+#include <omp.h>
+#include <algorithm>
+using namespace std;
+
+void merge(int arr[], int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int L[n1], R[n2];
+    for (int i = 0; i < n1; i++) L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) arr[k++] = L[i++];
+        else arr[k++] = R[j++];
+    }
+    while (i < n1) arr[k++] = L[i++];
+    while (j < n2) arr[k++] = R[j++];
+}
+
+void mergeSort(int arr[], int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        #pragma omp parallel sections
+        {
+            #pragma omp section
+            mergeSort(arr, l, m);
+            #pragma omp section
+            mergeSort(arr, m + 1, r);
+        }
+        merge(arr, l, m, r);
+    }
+}
+
+int main() {
+    const int N = 1000;
+    int arr[N];
+    for (int i = 0; i < N; i++) arr[i] = rand() % 1000;
+    double start = omp_get_wtime();
+    mergeSort(arr, 0, N - 1);
+    double end = omp_get_wtime();
+    cout << "Sorted array (first 10 values): ";
+    for (int i = 0; i < 10; i++) cout << arr[i] << " ";
+    cout << "\nTime taken: " << (end - start) << " seconds\n";
+    return 0;
+}
+
+Parallel Merge Sort using CUDA
+
+#include <iostream>
+#include <cuda_runtime.h>
+
+__device__ void merge(int *a, int *temp, int left, int mid, int right) {
+    int i = left, j = mid + 1, k = left;
+    while (i <= mid && j <= right) {
+        if (a[i] <= a[j]) temp[k++] = a[i++];
+        else temp[k++] = a[j++];
+    }
+    while (i <= mid) temp[k++] = a[i++];
+    while (j <= right) temp[k++] = a[j++];
+    for (int i = left; i <= right; i++) a[i] = temp[i];
+}
+
+__global__ void mergeSortKernel(int *a, int *temp, int size) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    int left = tid * size;
+    int right = min(left + size - 1, 999);
+    int mid = (left + right) / 2;
+    if (left < right && mid < right)
+        merge(a, temp, left, mid, right);
+}
+
+int main() {
+    const int N = 1000;
+    int h_arr[N], *d_arr, *d_temp;
+
+    for (int i = 0; i < N; i++) h_arr[i] = rand() % 1000;
+
+    cudaMalloc(&d_arr, N * sizeof(int));
+    cudaMalloc(&d_temp, N * sizeof(int));
+    cudaMemcpy(d_arr, h_arr, N * sizeof(int), cudaMemcpyHostToDevice);
+
+    for (int size = 2; size <= N; size *= 2)
+        mergeSortKernel<<<(N + size - 1) / size, 1>>>(d_arr, d_temp, size);
+
+    cudaMemcpy(h_arr, d_arr, N * sizeof(int), cudaMemcpyDeviceToHost);
+    std::cout << "Sorted array (first 10 values): ";
+    for (int i = 0; i < 10; i++) std::cout << h_arr[i] << " ";
+    std::cout << "\n";
+
+    cudaFree(d_arr);
+    cudaFree(d_temp);
+    return 0;
+}
